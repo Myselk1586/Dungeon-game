@@ -25,6 +25,36 @@ namespace Dungeon_game
             }
         }
         
+        public void PrintCave(ref Cave cave)
+        {
+            Console.SetCursorPosition(0, 0);
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (cave.tiles[y, x].GetSymbol() == '#')
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkGray;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+                    else if (cave.tiles[y, x].GetSymbol() == 'M')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Red;
+                    }
+                    else if (cave.tiles[y, x].GetSymbol() == '@')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Blue;
+                    }
+                    else
+                    {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+
+                    Console.Write(cave.tiles[y, x].GetSymbol());
+                }
+                Console.WriteLine();
+            }
+        }
 
     }
 }

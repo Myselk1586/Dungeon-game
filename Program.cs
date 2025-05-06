@@ -39,7 +39,7 @@ namespace Dungeon_game
             int y = random.Next(0, cave.height);
             for(int i = 0; i < 40; i++)
             {
-                if (cave.tiles[y, x].GetSymbol() == ' ')
+                if (cave.tiles[y, x].GetSymbol() != ' ')
                 {
                     x = random.Next(0, cave.width);
                     y = random.Next(0, cave.height);
@@ -117,66 +117,93 @@ namespace Dungeon_game
         {
             int x = 0;
             int y = 0;
-            for (int i=0; i < 20; i++)
+            Random random = new Random();
+            do
             {
-                Random random = new Random();
-                
-                x = random.Next(0, cave.width);
-                y = random.Next(0, cave.height);
-                if (cave.tiles[y, x].GetSymbol() != '#')
-                {
-                    PlayerPosX = x;
-                    PlayerPosY = y;
-                }
-            }
+                x = random.Next(3, cave.width); 
+                y = random.Next(3, cave.height);
+            } while (cave.tiles[y, x].GetSymbol() == '#');
             cave.tiles[y, x].MakePlayer();
             
         }
-
-        static void Main(string[] args)
+        static void IntroScene(ref Cave cave, int height, int width)
         {
-            int width = 80;
-            int height = 60;
-
-
-            Cave cave = new Cave(height, width);
-
-            // Build dungeon
             Build(height, width, ref cave);
             for (int i = 0; i < 8; i++)
             {
+                Console.SetCursorPosition(0, 0);
                 SmoothCave(ref cave);
+                cave.PrintCave(ref cave);
+                System.Threading.Thread.Sleep(1000);
+                Console.SetCursorPosition(0, 0);
             }
-            FindSpawn(ref cave);
-            for (int i = 0; i < 10; i++) // Adjust the number of monsters as needed
+
+            for (int i = 0; i < 60; i++) // Adjust the number of monsters as needed
             {
                 SpawnMonster(ref cave);
             }
-
+            FindSpawn(ref cave);
 
             // Print the dungeon map
-            for (int y = 0; y < height; y++)
+            cave.PrintCave(ref cave);
+        }
+        static void Controls()
+        { 
+            string input = Console.ReadKey().ToString();
+            switch(input)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    if (cave.tiles[y, x].GetSymbol() == '#')
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                        Console.ForegroundColor = ConsoleColor.Black;
-                    }
-                    else if (cave.tiles[y, x].GetSymbol() == 'M')
-                    {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                    }
-                    else 
-                    {
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
-
-                     Console.Write(cave.tiles[y, x].GetSymbol());
-                }
-                Console.WriteLine();
+                case "w":
+                    PlayerPosY++;
+                    break;
+                case "s":
+                    PlayerPosY++;
+                    break;
+                case "a":
+                    PlayerPosX--;
+                    break;
+                case "d":
+                    PlayerPosX++;
+                    break;
+                default:
+                    break;
             }
+            
+
+        }
+        static void Main(string[] args)
+        {
+            int width = 240;
+            int height = 67;
+            Cave cave = new Cave(height, width);
+            Console.ReadKey();
+            IntroScene(ref cave, height, width);
+            
+            while (true)
+            {
+
+                string input = Console.ReadKey().ToString();
+                switch (input)
+                {
+                    case "w":
+                        PlayerPosY++;
+                        break;
+                    case "s":
+                        PlayerPosY--;
+                        break;
+                    case "a":
+                        PlayerPosX--;
+                        break;
+                    case "d":
+                        PlayerPosX++;
+                        break;
+                    default:
+                        break;
+                }
+                cave.PrintCave(ref cave);
+            }
+            // Build dungeon
+
+
             Console.ReadKey();
         }
     }
