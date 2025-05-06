@@ -148,11 +148,11 @@ namespace Dungeon_game
                 SmoothCave(ref cave);
             }
             FindSpawn(ref cave);
-            for(int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++) // Adjust the number of monsters as needed
             {
                 SpawnMonster(ref cave);
             }
-            
+
 
             // Print the dungeon map
             for (int y = 0; y < height; y++)
@@ -173,7 +173,7 @@ namespace Dungeon_game
                         Console.BackgroundColor = ConsoleColor.Black;
                     }
 
-                        Console.Write(cave.tiles[y, x].GetSymbol());
+                     Console.Write(cave.tiles[y, x].GetSymbol());
                 }
                 Console.WriteLine();
             }
