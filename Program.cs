@@ -8,8 +8,8 @@ namespace Dungeon_game
 {
     internal class Program
     {
-        static int PlayerPosX;
-        static int PlayerPosY;
+        public static int PlayerPosX;
+        public static int PlayerPosY;
         static void Build(int height, int width, ref Cave cave)
         {
 
@@ -124,7 +124,9 @@ namespace Dungeon_game
                 y = random.Next(3, cave.height);
             } while (cave.tiles[y, x].GetSymbol() == '#');
             cave.tiles[y, x].MakePlayer();
-            
+            PlayerPosX = x;
+            PlayerPosY = y;
+
         }
         static void IntroScene(ref Cave cave, int height, int width)
         {
@@ -147,60 +149,62 @@ namespace Dungeon_game
             // Print the dungeon map
             cave.PrintCave(ref cave);
         }
-        static void Controls()
+        static void Controls(ref Cave cave)
         { 
-            string input = Console.ReadKey().ToString();
-            switch(input)
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            int newX = PlayerPosX;
+            int newY = PlayerPosY;
+
+            switch (key.Key)
             {
-                case "w":
-                    PlayerPosY++;
+                case ConsoleKey.W:
+                    newY--; 
                     break;
-                case "s":
-                    PlayerPosY++;
+                case ConsoleKey.S:
+                    newY++; 
                     break;
-                case "a":
-                    PlayerPosX--;
+                case ConsoleKey.A:
+                    newX--; 
                     break;
-                case "d":
-                    PlayerPosX++;
+                case ConsoleKey.D:
+                    newX++; 
                     break;
+                case ConsoleKey.Escape:
+                    return;
                 default:
+                    Console.WriteLine("That was NOT a valid key.");
                     break;
             }
+
+            // Check if new position is within bounds and walkable
+            if (newX >= 0 && newX < cave.width &&
+                newY >= 0 && newY < cave.height &&
+                (cave.tiles[newY, newX].GetSymbol() == ' ' 
+                || cave.tiles[newY,newX].GetSymbol() == 'M'
+                || cave.tiles[newY, newX].GetSymbol() == '*') )
+            {
+                cave.tiles[PlayerPosY, PlayerPosX].MakeFloor(); 
+                PlayerPosX = newX;
+                PlayerPosY = newY;
+                cave.tiles[PlayerPosY, PlayerPosX].MakePlayer(); 
+            }
             
+            cave.PrintCave(ref cave);
 
         }
         static void Main(string[] args)
         {
-            int width = 240;
+            int width = 80;
             int height = 67;
             Cave cave = new Cave(height, width);
             Console.ReadKey();
             IntroScene(ref cave, height, width);
-            
             while (true)
             {
-
-                string input = Console.ReadKey().ToString();
-                switch (input)
-                {
-                    case "w":
-                        PlayerPosY++;
-                        break;
-                    case "s":
-                        PlayerPosY--;
-                        break;
-                    case "a":
-                        PlayerPosX--;
-                        break;
-                    case "d":
-                        PlayerPosX++;
-                        break;
-                    default:
-                        break;
-                }
-                cave.PrintCave(ref cave);
+                Controls(ref cave);
             }
+            
+
             // Build dungeon
 
 

@@ -14,6 +14,7 @@ namespace Dungeon_game
         private bool hasMonster;
         private bool hasTreasure;
         private bool isVisible;
+        private bool isFloor;
 
         public Tile(bool isWall, bool hasPlayer, bool hasMonster, bool hasTreasure, bool isVisible)
         {
@@ -29,7 +30,7 @@ namespace Dungeon_game
         }
         public void MakeFloor()
         {
-            isWall = false;
+            isFloor = true;
         }
         public void MakePlayer()
         {
@@ -58,9 +59,13 @@ namespace Dungeon_game
             {
                 return '#';
             }
-            else
+            else if (isFloor)
             {
                 return ' ';
+            }
+            else 
+            {
+                return 'X';
             }
             
         }

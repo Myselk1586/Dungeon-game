@@ -41,9 +41,14 @@ namespace Dungeon_game
                     {
                         Console.BackgroundColor = ConsoleColor.Red;
                     }
-                    else if (cave.tiles[y, x].GetSymbol() == '@')
+                    else if (cave.tiles[y, x].GetSymbol() == '@' )
                     {
                         Console.BackgroundColor = ConsoleColor.Blue;
+                    }
+                    else if (cave.tiles[y, x].GetSymbol() == ' ')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.Black;
                     }
                     else
                     {
