@@ -42,26 +42,27 @@ namespace Dungeon_game
         
         public char GetSymbol()
         {
-            if (isWall)
+            if (hasPlayer)
             {
-                return '#';
-            }
-            else if (hasPlayer)
-            {
-                return 'P';
+                return '@';
             }
             else if (hasMonster)
             {
-                return '0';
+                return 'M';
             }
             else if (hasTreasure)
             {
-                return 'T';
+                return '*';
+            }
+            else if (isWall)
+            {
+                return '#';
             }
             else
             {
                 return ' ';
             }
+            
         }
     }
 }
