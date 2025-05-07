@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Threading.Tasks;
+using System.Diagnostics.SymbolStore;
 
 
 namespace Dungeon_game
@@ -12,7 +13,7 @@ namespace Dungeon_game
     {
         public static int PlayerPosX;
         public static int PlayerPosY;
-        
+        public static bool alive = true;
         static void Build(int height, int width, ref Cave cave)
         {
 
@@ -201,56 +202,47 @@ namespace Dungeon_game
         
         static void MonsterMultiplication(ref Cave cave)
         {
-            Tile[,] newTiles = new Tile[cave.height, cave.width];
+            
 
             for (int y = 0; y < cave.height; y++)
             {
                 for (int x = 0; x < cave.width; x++)
                 {
-
-                    Tile tile = new Tile(false, false, false, false, false);
-
-                    int wallCount = WallCount(ref cave, x, y);
-
-                    if (wallCount >= 5)
-                        tile.MakeWall();
-                    else
-                        tile.MakeFloor();
-
-                    newTiles[y, x] = tile;
-                }
-            }
-
-
-            for (int y = 0; y < cave.height; y++)
-            {
-                for (int x = 0; x < cave.width; x++)
-                {
-                    if (x < 3 || x >= cave.width - 3 || y < 3 || y >= cave.height - 3)
+                    if (cave.tiles[y, x].GetSymbol() == 'M' && ((y + 1) <= cave.height && (x + 1) <= cave.width))
                     {
-
-                        newTiles[y, x].MakeWall();
+                        Random random = new Random();
+                        int chance = random.Next(0, 100);
+                        if (chance <= 5)
+                        {
+                            cave.tiles[y + 1, x].MakeMonster();
+                        }
+                        else if (chance <= 5)
+                        {
+                            cave.tiles[y, x + 1].MakeMonster();
+                        }
                     }
+
                 }
             }
 
 
-            cave.tiles = newTiles;
+            
         }
 
 
         static void Main(string[] args)
         {
-            int width = 200;
+            int width = 120;
             int height = 67;
             Cave cave = new Cave(height, width);
             Console.ReadKey();
             IntroScene(ref cave, height, width);
             Console.CursorVisible = false;
-            while (true)
+            while (alive)
             {
                 Controls(ref cave);
-
+                MonsterMultiplication(ref cave);
+                cave.PrintCave(ref cave);
             }
             
 
