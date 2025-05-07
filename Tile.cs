@@ -60,7 +60,15 @@ namespace Dungeon_game
             hasTreasure = false;
 
         }
-        
+        public void MakeTreasure()
+        {
+            hasTreasure = true;
+            isWall = false;
+            isFloor = false;
+            hasPlayer = false;
+            hasMonster = false;
+        }
+
         public char GetSymbol()
         {
             if (hasPlayer)

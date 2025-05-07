@@ -153,6 +153,19 @@ namespace Dungeon_game
             
             cave.PrintCave(ref cave);
         }
+        static void aliveCheck(ref Cave cave)
+        {
+            for (int y = 0; y < cave.height; y++)
+            {
+                for (int x = 0; x < cave.width; x++)
+                {
+                    if (cave.tiles[y, x].GetSymbol() == 'M' && PlayerPosX == x && PlayerPosY == y)
+                    {
+                        alive = false;
+                    }
+                }
+            }
+        }
         static void Controls(ref Cave cave)
         { 
             ConsoleKeyInfo key = Console.ReadKey(true);
@@ -199,37 +212,65 @@ namespace Dungeon_game
 
 
         }
-        
+
         static void MonsterMultiplication(ref Cave cave)
         {
-            
+            Random random = new Random();
 
             for (int y = 0; y < cave.height; y++)
             {
                 for (int x = 0; x < cave.width; x++)
                 {
-                    if (cave.tiles[y, x].GetSymbol() == 'M' && ((y + 1) <= cave.height && (x + 1) <= cave.width))
+                    
+                    if (cave.tiles[y, x].GetSymbol() == 'M')
                     {
-                        Random random = new Random();
                         int chance = random.Next(0, 100);
-                        if (chance <= 5)
+
+                        
+                        if (chance <= 5 && y + 1 < cave.height && cave.tiles[y + 1, x].GetSymbol() != 'M')
                         {
+                            if (cave.tiles[y + 1, x].GetSymbol() == '@') alive = false;
                             cave.tiles[y + 1, x].MakeMonster();
                         }
-                        else if (chance <= 5)
+                        
+                        else if (chance > 5 && chance <= 10 && y - 1 >= 0 && cave.tiles[y - 1, x].GetSymbol() != 'M')
                         {
+                            if (cave.tiles[y - 1, x].GetSymbol() == '@') alive = false;
+                            cave.tiles[y - 1, x].MakeMonster();
+                        }
+                        
+                        else if (chance > 10 && chance <= 15 && x + 1 < cave.width && cave.tiles[y, x + 1].GetSymbol() != 'M')
+                        {
+                            if (cave.tiles[y, x + 1].GetSymbol() == '@') alive = false;
                             cave.tiles[y, x + 1].MakeMonster();
                         }
+                        
+                        else if (chance > 15 && chance <= 20 && x - 1 >= 0 && cave.tiles[y, x - 1].GetSymbol() != 'M')
+                        {
+                            if (cave.tiles[y, x - 1].GetSymbol() == '@') alive = false;
+                            cave.tiles[y, x - 1].MakeMonster();
+                        }
                     }
-
                 }
             }
-
-
-            
         }
 
-
+        static void PlaceTreasure(ref Cave cave)
+        {
+            Random random = new Random();
+            int x = random.Next(0, cave.width);
+            int y = random.Next(0, cave.height);
+            for (int i = 0; i < 40; i++)
+            {
+                if (cave.tiles[y, x].GetSymbol() != ' ')
+                {
+                    x = random.Next(0, cave.width);
+                    y = random.Next(0, cave.height);
+                }
+            }
+            cave.tiles[y, x].MakeTreasure();
+        }
+        
         static void Main(string[] args)
         {
             int width = 120;
@@ -242,9 +283,10 @@ namespace Dungeon_game
             {
                 Controls(ref cave);
                 MonsterMultiplication(ref cave);
-                cave.PrintCave(ref cave);
+                aliveCheck(ref cave);
+                
             }
-            
+            Console.WriteLine("You are Dead");
 
             // Build dungeon
 

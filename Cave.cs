@@ -50,6 +50,11 @@ namespace Dungeon_game
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.ForegroundColor = ConsoleColor.Black;
                     }
+                    else if (cave.tiles[y, x].GetSymbol() == '*')
+                    {
+                        Console.BackgroundColor = ConsoleColor.Yellow;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
                     else
                     {
                         Console.BackgroundColor = ConsoleColor.Black;
@@ -77,6 +82,10 @@ namespace Dungeon_game
                 case '@':
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case '*':
+                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Black;
                     break;
                 default:
                     Console.BackgroundColor = ConsoleColor.Black;
