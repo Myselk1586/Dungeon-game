@@ -269,7 +269,7 @@ namespace Dungeon_game
             Console.WriteLine("How Long can you survive?");
             Console.WriteLine("You can kill the monsters but if They gang up on you they can kill you...");
             Console.WriteLine("You have the strength to push through them but they do too. Avoid than at all costs");
-            Console.WriteLine($"HIGH SCORE: {contents}");
+            
             System.Threading.Thread.Sleep(6000);
 
 
@@ -331,19 +331,10 @@ namespace Dungeon_game
                 aliveCheck(ref cave);
             }
             stopwatch.Stop();
+            Console.SetCursorPosition(0, 0);
+            Console.Clear();
             Console.WriteLine($"You lasted{stopwatch.Elapsed.TotalSeconds} seconds!");
             Console.WriteLine("You are Dead");
-
-            string fileName = "HighScores.txt";
-
-            string contents = File.ReadAllText(fileName);
-            
-
-            if (stopwatch.Elapsed.TotalSeconds >int.Parse(contents))
-            {
-                Console.WriteLine($"You have a new high score of {stopwatch.Elapsed.TotalSeconds}!");
-                File.WriteAllText(fileName, stopwatch.Elapsed.TotalSeconds.ToString());
-            }
 
             System.Threading.Thread.Sleep(10000);
 
