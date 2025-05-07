@@ -27,18 +27,38 @@ namespace Dungeon_game
         public void MakeWall()
         {
             isWall = true;
+            hasPlayer = false;
+            hasMonster = false;
+            hasTreasure = false;
+            isFloor = false;
+
         }
         public void MakeFloor()
         {
             isFloor = true;
+            isWall = false;
+            hasPlayer = false;
+            hasMonster = false;
+            hasTreasure = false;
+
         }
         public void MakePlayer()
         {
             hasPlayer = true;
+            isWall = false;
+            isFloor = false;
+            hasMonster = false;
+            hasTreasure = false;
+
         }
         public  void MakeMonster()
         {
             hasMonster = true;
+            isWall = false;
+            isFloor = false;
+            hasPlayer = false;
+            hasTreasure = false;
+
         }
         
         public char GetSymbol()

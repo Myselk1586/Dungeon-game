@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using System.Threading.Tasks;
+
 
 namespace Dungeon_game
 {
@@ -10,6 +12,7 @@ namespace Dungeon_game
     {
         public static int PlayerPosX;
         public static int PlayerPosY;
+        
         static void Build(int height, int width, ref Cave cave)
         {
 
@@ -18,11 +21,11 @@ namespace Dungeon_game
             {
                 for (int x = 0; x < cave.width; x++)
                 {
-                    if (random.Next(0, 100) <= 65)
+                    if (random.Next(0, 100) <= 70)
                     {
                         cave.tiles[y, x] = new Tile(true, false, false, false, false); // wals
                     }
-                    if (random.Next(0, 100) <= 30)
+                    if (random.Next(0, 100) >= 65)
                     {
                         cave.tiles[y, x] = new Tile(false, false, false, false, false); // floor
                     }
@@ -136,17 +139,17 @@ namespace Dungeon_game
                 Console.SetCursorPosition(0, 0);
                 SmoothCave(ref cave);
                 cave.PrintCave(ref cave);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(16);
                 Console.SetCursorPosition(0, 0);
             }
 
-            for (int i = 0; i < 60; i++) // Adjust the number of monsters as needed
+            for (int i = 0; i < 60; i++) 
             {
                 SpawnMonster(ref cave);
             }
             FindSpawn(ref cave);
 
-            // Print the dungeon map
+            
             cave.PrintCave(ref cave);
         }
         static void Controls(ref Cave cave)
@@ -176,7 +179,7 @@ namespace Dungeon_game
                     break;
             }
 
-            // Check if new position is within bounds and walkable
+            
             if (newX >= 0 && newX < cave.width &&
                 newY >= 0 && newY < cave.height &&
                 (cave.tiles[newY, newX].GetSymbol() == ' ' 
@@ -184,25 +187,70 @@ namespace Dungeon_game
                 || cave.tiles[newY, newX].GetSymbol() == '*') )
             {
                 cave.tiles[PlayerPosY, PlayerPosX].MakeFloor(); 
+                cave.Update(PlayerPosX, PlayerPosY, cave.tiles[PlayerPosY, PlayerPosX]);
                 PlayerPosX = newX;
                 PlayerPosY = newY;
-                cave.tiles[PlayerPosY, PlayerPosX].MakePlayer(); 
+                cave.tiles[PlayerPosY, PlayerPosX].MakePlayer();
+                cave.Update(PlayerPosX, PlayerPosY, cave.tiles[PlayerPosY, PlayerPosX]);
             }
             
             cave.PrintCave(ref cave);
 
 
         }
+        
+        static void MonsterMultiplication(ref Cave cave)
+        {
+            Tile[,] newTiles = new Tile[cave.height, cave.width];
+
+            for (int y = 0; y < cave.height; y++)
+            {
+                for (int x = 0; x < cave.width; x++)
+                {
+
+                    Tile tile = new Tile(false, false, false, false, false);
+
+                    int wallCount = WallCount(ref cave, x, y);
+
+                    if (wallCount >= 5)
+                        tile.MakeWall();
+                    else
+                        tile.MakeFloor();
+
+                    newTiles[y, x] = tile;
+                }
+            }
+
+
+            for (int y = 0; y < cave.height; y++)
+            {
+                for (int x = 0; x < cave.width; x++)
+                {
+                    if (x < 3 || x >= cave.width - 3 || y < 3 || y >= cave.height - 3)
+                    {
+
+                        newTiles[y, x].MakeWall();
+                    }
+                }
+            }
+
+
+            cave.tiles = newTiles;
+        }
+
+
         static void Main(string[] args)
         {
-            int width = 80;
+            int width = 200;
             int height = 67;
             Cave cave = new Cave(height, width);
             Console.ReadKey();
             IntroScene(ref cave, height, width);
+            Console.CursorVisible = false;
             while (true)
             {
                 Controls(ref cave);
+
             }
             
 

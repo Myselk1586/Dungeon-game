@@ -60,6 +60,33 @@ namespace Dungeon_game
                 Console.WriteLine();
             }
         }
+        public void Update(int x, int y, Tile tile)
+        {
+            Console.SetCursorPosition(x, y);
+
+            switch (tile.GetSymbol())
+            {
+                case '#':
+                    Console.BackgroundColor = ConsoleColor.DarkGray;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+                case 'M':
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+                case '@':
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                default:
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    break;
+            }
+
+            Console.Write(tile.GetSymbol());
+            Console.ResetColor();
+        }
 
     }
 }
