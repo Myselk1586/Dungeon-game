@@ -1,10 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Diagnostics.SymbolStore;
+using System.Diagnostics;
+using System.ComponentModel.Design;
+using System.Xml.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace Dungeon_game
@@ -33,15 +38,15 @@ namespace Dungeon_game
 
                 }
             }
-            
-            
+
+
         }
         static void SpawnMonster(ref Cave cave)
         {
             Random random = new Random();
             int x = random.Next(0, cave.width);
             int y = random.Next(0, cave.height);
-            for(int i = 0; i < 40; i++)
+            for (int i = 0; i < 50; i++)
             {
                 if (cave.tiles[y, x].GetSymbol() != ' ')
                 {
@@ -49,19 +54,19 @@ namespace Dungeon_game
                     y = random.Next(0, cave.height);
                 }
             }
-            
+
             cave.tiles[y, x].MakeMonster();
         }
         static void SmoothCave(ref Cave cave)
         {
-            
+
             Tile[,] newTiles = new Tile[cave.height, cave.width];
 
             for (int y = 0; y < cave.height; y++)
             {
                 for (int x = 0; x < cave.width; x++)
                 {
-                    
+
                     Tile tile = new Tile(false, false, false, false, false);
 
                     int wallCount = WallCount(ref cave, x, y);
@@ -75,20 +80,20 @@ namespace Dungeon_game
                 }
             }
 
-            
+
             for (int y = 0; y < cave.height; y++)
             {
                 for (int x = 0; x < cave.width; x++)
                 {
                     if (x < 3 || x >= cave.width - 3 || y < 3 || y >= cave.height - 3)
                     {
-                        
+
                         newTiles[y, x].MakeWall();
                     }
                 }
             }
 
-            
+
             cave.tiles = newTiles;
         }
 
@@ -124,7 +129,7 @@ namespace Dungeon_game
             Random random = new Random();
             do
             {
-                x = random.Next(3, cave.width); 
+                x = random.Next(3, cave.width);
                 y = random.Next(3, cave.height);
             } while (cave.tiles[y, x].GetSymbol() == '#');
             cave.tiles[y, x].MakePlayer();
@@ -144,13 +149,13 @@ namespace Dungeon_game
                 Console.SetCursorPosition(0, 0);
             }
 
-            for (int i = 0; i < 60; i++) 
+            for (int i = 0; i < 60; i++)
             {
                 SpawnMonster(ref cave);
             }
             FindSpawn(ref cave);
 
-            
+
             cave.PrintCave(ref cave);
         }
         static void aliveCheck(ref Cave cave)
@@ -167,7 +172,7 @@ namespace Dungeon_game
             }
         }
         static void Controls(ref Cave cave)
-        { 
+        {
             ConsoleKeyInfo key = Console.ReadKey(true);
             int newX = PlayerPosX;
             int newY = PlayerPosY;
@@ -175,16 +180,16 @@ namespace Dungeon_game
             switch (key.Key)
             {
                 case ConsoleKey.W:
-                    newY--; 
+                    newY--;
                     break;
                 case ConsoleKey.S:
-                    newY++; 
+                    newY++;
                     break;
                 case ConsoleKey.A:
-                    newX--; 
+                    newX--;
                     break;
                 case ConsoleKey.D:
-                    newX++; 
+                    newX++;
                     break;
                 case ConsoleKey.Escape:
                     return;
@@ -193,21 +198,21 @@ namespace Dungeon_game
                     break;
             }
 
-            
+
             if (newX >= 0 && newX < cave.width &&
                 newY >= 0 && newY < cave.height &&
-                (cave.tiles[newY, newX].GetSymbol() == ' ' 
-                || cave.tiles[newY,newX].GetSymbol() == 'M'
-                || cave.tiles[newY, newX].GetSymbol() == '*') )
+                (cave.tiles[newY, newX].GetSymbol() == ' '
+                || cave.tiles[newY, newX].GetSymbol() == 'M'
+                || cave.tiles[newY, newX].GetSymbol() == '*'))
             {
-                cave.tiles[PlayerPosY, PlayerPosX].MakeFloor(); 
+                cave.tiles[PlayerPosY, PlayerPosX].MakeFloor();
                 cave.Update(PlayerPosX, PlayerPosY, cave.tiles[PlayerPosY, PlayerPosX]);
                 PlayerPosX = newX;
                 PlayerPosY = newY;
                 cave.tiles[PlayerPosY, PlayerPosX].MakePlayer();
                 cave.Update(PlayerPosX, PlayerPosY, cave.tiles[PlayerPosY, PlayerPosX]);
             }
-            
+
             cave.PrintCave(ref cave);
 
 
@@ -221,75 +226,126 @@ namespace Dungeon_game
             {
                 for (int x = 0; x < cave.width; x++)
                 {
-                    
+
                     if (cave.tiles[y, x].GetSymbol() == 'M')
                     {
                         int chance = random.Next(0, 100);
 
-                        
+
                         if (chance <= 5 && y + 1 < cave.height && cave.tiles[y + 1, x].GetSymbol() != 'M')
                         {
                             if (cave.tiles[y + 1, x].GetSymbol() == '@') alive = false;
-                            cave.tiles[y + 1, x].MakeMonster();
+                            if (cave.tiles[y + 1, x].GetSymbol() != '#') cave.tiles[y + 1, x].MakeMonster();
                         }
-                        
+
                         else if (chance > 5 && chance <= 10 && y - 1 >= 0 && cave.tiles[y - 1, x].GetSymbol() != 'M')
                         {
                             if (cave.tiles[y - 1, x].GetSymbol() == '@') alive = false;
-                            cave.tiles[y - 1, x].MakeMonster();
+                            if (cave.tiles[y - 1, x].GetSymbol() != '#') cave.tiles[y - 1, x].MakeMonster();
                         }
-                        
+
                         else if (chance > 10 && chance <= 15 && x + 1 < cave.width && cave.tiles[y, x + 1].GetSymbol() != 'M')
                         {
                             if (cave.tiles[y, x + 1].GetSymbol() == '@') alive = false;
-                            cave.tiles[y, x + 1].MakeMonster();
+                            if (cave.tiles[y, x + 1].GetSymbol() != '#') cave.tiles[y, x + 1].MakeMonster();
                         }
-                        
+
                         else if (chance > 15 && chance <= 20 && x - 1 >= 0 && cave.tiles[y, x - 1].GetSymbol() != 'M')
                         {
                             if (cave.tiles[y, x - 1].GetSymbol() == '@') alive = false;
-                            cave.tiles[y, x - 1].MakeMonster();
+                            if (cave.tiles[y, x - 1].GetSymbol() != '#') cave.tiles[y, x - 1].MakeMonster();
                         }
                     }
                 }
             }
         }
 
-        static void PlaceTreasure(ref Cave cave)
+
+        static void Menu()
         {
-            Random random = new Random();
-            int x = random.Next(0, cave.width);
-            int y = random.Next(0, cave.height);
-            for (int i = 0; i < 40; i++)
-            {
-                if (cave.tiles[y, x].GetSymbol() != ' ')
-                {
-                    x = random.Next(0, cave.width);
-                    y = random.Next(0, cave.height);
-                }
-            }
-            cave.tiles[y, x].MakeTreasure();
+            string fileName = "HighScores.txt";
+            string contents = File.ReadAllText(fileName);
+            Console.WriteLine("Welcome to the Dungeon Game!");
+            Console.WriteLine("How Long can you survive?");
+            Console.WriteLine("You can kill the monsters but if They gang up on you they can kill you...");
+            Console.WriteLine("You have the strength to push through them but they do too. Avoid than at all costs");
+            Console.WriteLine($"HIGH SCORE: {contents}");
+            System.Threading.Thread.Sleep(6000);
+
+
         }
-        
+
+
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             int width = 120;
             int height = 67;
+            Menu();
+
+            string input = "";
+
+            try
+            {
+                Console.WriteLine("Select Your difficulty  \n1. Hard\n2. Medium\n3.  Easy");
+                Console.Write("Enter 1, 2, or 3: ");
+                input = Console.ReadLine();
+
+                if (input != "1" && input != "2" && input != "3")
+                    throw new ArgumentOutOfRangeException();
+
+                
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Console.WriteLine("Invalid input. Please enter 1, 2, or 3 only >:(");
+            }
+
+
+            switch (input)
+            {
+                case "1":
+                    width = 80;
+                    height = 67;
+                    break;
+                case "2":
+                    width = 120;
+                    height = 67;
+                    break;
+                case "3":
+                    width = 240;
+                    height = 67;
+                    break;
+
+            }
+
             Cave cave = new Cave(height, width);
             Console.ReadKey();
             IntroScene(ref cave, height, width);
-            Console.CursorVisible = false;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             while (alive)
             {
                 Controls(ref cave);
                 MonsterMultiplication(ref cave);
                 aliveCheck(ref cave);
-                
             }
+            stopwatch.Stop();
+            Console.WriteLine($"You lasted{stopwatch.Elapsed.TotalSeconds} seconds!");
             Console.WriteLine("You are Dead");
 
-            // Build dungeon
+            string fileName = "HighScores.txt";
 
+            string contents = File.ReadAllText(fileName);
+            
+
+            if (stopwatch.Elapsed.TotalSeconds >int.Parse(contents))
+            {
+                Console.WriteLine($"You have a new high score of {stopwatch.Elapsed.TotalSeconds}!");
+                File.WriteAllText(fileName, stopwatch.Elapsed.TotalSeconds.ToString());
+            }
+
+            System.Threading.Thread.Sleep(10000);
 
             Console.ReadKey();
         }
